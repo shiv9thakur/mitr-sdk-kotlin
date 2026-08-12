@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("maven-publish")
 }
 
 android {
@@ -15,6 +16,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 kotlin {
@@ -24,4 +31,19 @@ kotlin {
 dependencies {
     api(project(":core"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+}
+
+// JitPack builds this publication and republishes it under
+// com.github.shiv9thakur:mitr-sdk-kotlin:<tag> — groupId/artifactId/version
+// here are placeholders JitPack overrides at build time.
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.shiv9thakur"
+                artifactId = "mitr-sdk-kotlin"
+            }
+        }
+    }
 }
